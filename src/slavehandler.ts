@@ -21,6 +21,10 @@ function newBot() {
 			d:{}
 		})
 	})
+	Bot.on('death',()=>{
+		console.log('I have died, stopping duping to prevent further damage.')
+		stopDuping(Bot)
+	})
 	stopDuping(Bot);
 	startDuping(Bot);
 }
@@ -44,7 +48,14 @@ if (isWorker) {
 						})
 
 						newBot()
-					},console.log)
+					},rej=>{
+						process?.send?.({
+							m:'login',
+							u:content.u,
+							d: rej,
+							e:true
+						})
+					})
 
 				} break;
 				case 'relogin' : {
@@ -65,7 +76,14 @@ if (isWorker) {
 						newBot()
 
 
-					},console.log)
+					},rej=>{
+						process?.send?.({
+							m:'login',
+							u:content.u,
+							d: rej,
+							e:true
+						})
+					})
 				} break;
 				case '75' :{
 

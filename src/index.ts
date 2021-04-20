@@ -16,14 +16,10 @@ async function main () {
 	const accounts = file.split(/\r?\n/).map(login => login.split(':')).filter(v=>!!v[0])
 	const botProms = accounts.map(addacc)
 	// const bots = await Promise.allSettled(botProms)
-	const bots = (await Promise.allSettled(botProms)).map(({ value, reason } : {value:any,reason:any} | any) => value || reason).filter(value => !(value instanceof Error))
+	const bots = (await Promise.allSettled(botProms)).map(({ value, reason } : {value:any,reason:any} | any) => value || reason).filter(value => !(value instanceof Error) && value !== undefined)
 	console.log(`Bots (${bots.length} / ${accounts.length}) successfully logged in.`)
 
-	for (let bot of bm.bots) {
-		// bot.once('respawn',()=>{
-		// 	bm.relog(bot)
-		// })
-	}
+	console.log(bots)
 
 }
 

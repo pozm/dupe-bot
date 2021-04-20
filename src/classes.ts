@@ -11,6 +11,7 @@ export interface message {
 	m:string,
 	d:{[x:string]:any},
 	u:string
+	e?:boolean
 }
 
 export interface exWorker extends Cluster.Worker {
@@ -64,12 +65,18 @@ export class BotManager {
 			this.removeUser(id)
 			if (this.exit)
 				return;
-			let [play] = await this.login(cred[0],cred[1])
+			let out = await this.login(cred[0],cred[1])
+			if (!out)
+				return;
+			let [play] = out
 			this._bots.push(play)
 		})
-		cluster.on('online',worker => console.log(`new worker online ${worker.id}`))
-
-
+		cluster.on('online',worker => {
+			console.log(`new worker online ${worker.id}`);
+			worker.once('error',v=>{
+				console.log(`worker [${worker.id}] has encountered an error`, v)
+			})
+		})
 
 	}
 
@@ -96,7 +103,6 @@ export class BotManager {
 	}
 
 	uuidFromW(worker:number) : string {
-		console.log([...this.uuidToWorker.entries()],worker)
 		return [...this.uuidToWorker.entries()].filter(([k,v])=> v == worker)?.[0]?.[0]
 	}
 
@@ -208,7 +214,7 @@ export class BotManager {
 		this._bots = this._bots.filter(v => v.uuid != uuid)
 	}
 
-	login(user:string,pass:string) : Promise<[Player,Cluster.Worker]> {
+	login(user:string,pass:string) : Promise<[Player,Cluster.Worker] | undefined> {
 		return new Promise(res=>{
 			cluster.fork()
 			let id = uuidv4()
@@ -225,9 +231,13 @@ export class BotManager {
 			const listener = (w:Cluster.Worker,content : message & {d:Player}) => {
 				if (content.u != id)
 					return;
+				else if (content.e) {
+					console.log(`ERR logging into [${w.id}] - ${user}`,content.d)
+					res(undefined)
+					cluster.removeListener('message',listener)
+				}
 				else {
 					res([content.d,w])
-					console.log(content.d)
 					this.cred[content.d.uuid] = [user,pass]
 					cluster.removeListener('message',listener)
 				}
@@ -236,11 +246,16 @@ export class BotManager {
 		})
 	}
 
-	add([_u, _p] : string[], ix : number) : Promise<Player> {
-		return new Promise(res=>{
+	add([_u, _p] : string[], ix : number) : Promise<Player|undefined> {
+		return new Promise((res,reject)=>{
 
 			setTimeout(async ()=>{
-				let [Player,Worker] = await this.login(_u,_p)
+				let out = await this.login(_u,_p)
+				if (!out)
+				{
+					return reject(undefined)
+				}
+				let [Player,Worker] = out
 				this.uuidToWorker.set(Player.uuid,Worker.id)
 				this._bots.push(Player)
 				res(Player)

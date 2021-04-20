@@ -20,8 +20,6 @@ export function login(u:string,p:string) : Promise<Bot> {
 		bot.on('spawn', () => {
 			resolve(bot)
 		})
-		// bot.on('kicked', console.log)
-		bot.on('death',console.log)
 		bot.on('error', (err) => reject(err))
 		setTimeout(() => reject(Error('Took too long to spawn.')), 5000) // 5 sec
 	})
