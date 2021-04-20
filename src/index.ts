@@ -19,7 +19,7 @@ async function main () {
 	const bots = (await Promise.allSettled(botProms)).map(({ value, reason } : {value:any,reason:any} | any) => value || reason).filter(value => !(value instanceof Error) && value !== undefined)
 	console.log(`Bots (${bots.length} / ${accounts.length}) successfully logged in.`)
 
-	console.log(bots)
+	console.log(inspect(bm.uuidToWorker))
 
 }
 

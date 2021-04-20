@@ -21,7 +21,7 @@ export function login(u:string,p:string) : Promise<Bot> {
 			resolve(bot)
 		})
 		bot.on('error', (err) => reject(err))
-		setTimeout(() => reject(Error('Took too long to spawn.')), 5000) // 5 sec
+		setTimeout(() => reject(Error('Took too long to spawn.')), 16e3)
 	})
 
 }

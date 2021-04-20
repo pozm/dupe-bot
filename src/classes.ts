@@ -21,7 +21,7 @@ export interface exWorker extends Cluster.Worker {
 export class BotManager {
 	private _bots : Player[]
 	cred : {[x:string]:string[]}
-	private uuidToWorker : Map<string,number>
+	uuidToWorker : Map<string,number>
 	private exit : boolean
 	private ingamePlayers : Player[]
 
@@ -231,13 +231,14 @@ export class BotManager {
 			const listener = (w:Cluster.Worker,content : message & {d:Player}) => {
 				if (content.u != id)
 					return;
-				else if (content.e) {
-					console.log(`ERR logging into [${w.id}] - ${user}`,content.d)
+				else if (content.e || !content.d || !content?.d?.uuid) {
+					console.log(`ERR logging into [${w.id}] - ${user}`,content.d,content)
 					res(undefined)
 					cluster.removeListener('message',listener)
 				}
 				else {
 					res([content.d,w])
+					// console.log(content.d)
 					this.cred[content.d.uuid] = [user,pass]
 					cluster.removeListener('message',listener)
 				}
