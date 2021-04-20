@@ -63,7 +63,7 @@ export class BotManager {
 			let id = this.uuidFromW(worker.id)
 			let cred = this.cred[id]
 			this.removeUser(id)
-			if (this.exit)
+			if (this.exit || !cred || !cred?.[0])
 				return;
 			let out = await this.login(cred[0],cred[1])
 			if (!out)
