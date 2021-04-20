@@ -164,5 +164,11 @@ if (isWorker) {
 			console.error(e)
 		}
 	})
+	process.on('unhandledRejection',da=>{
+
+	})
+	process.on('uncaughtException',da=>{
+
+	})
 
 }

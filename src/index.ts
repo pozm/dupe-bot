@@ -12,6 +12,7 @@ let addacc = bm.add.bind(bm)
 
 async function main () {
 	// convert accounts.txt => array
+	// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = String(0);
 	const file = readFileSync('acc.txt').toString()
 	const accounts = file.split(/\r?\n/).map(login => login.split(':')).filter(v=>!!v[0])
 	const botProms = accounts.map(addacc)
@@ -20,6 +21,7 @@ async function main () {
 	console.log(`Bots (${bots.length} / ${accounts.length}) successfully logged in.`)
 
 	console.log(inspect(bm.uuidToWorker))
+
 
 }
 
