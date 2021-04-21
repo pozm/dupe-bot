@@ -13,11 +13,11 @@ const proxies = readFileSync('pxy.txt').toString().split('\r\n').filter(v=>!!v)
 
 export function login(u:string,p:string) : Promise<Bot> {
 	// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-	console.log(getrnd(0,proxies.length-1),proxies.length-1,proxies)
+	// console.log(getrnd(0,proxies.length-1),proxies.length-1,proxies)
 	const prox = proxies[getrnd(0,proxies.length-1)].split(':')
 	const proxy = {host:prox[0],port:prox[1]}
 	const minecraft = { host: config.host, port: 25565 };
-	console.log(proxy,minecraft)
+	// console.log(proxy,minecraft)
 	return new Promise((resolve,reject) => {
 
 		const bot = mineflayer.createBot({
@@ -50,7 +50,14 @@ export function login(u:string,p:string) : Promise<Bot> {
 			//
 			// agent: new ProxyAgent({ protocol: 'socks5:', host: proxy.host, port: proxy.port } as any),
 		})
+		let NOBAIT = false;
+		bot._client.on('end',(r)=> {
+			NOBAIT = true
+			reject('SESSION END')
+		})
 		bot.on('spawn', () => {
+			if (NOBAIT)
+				reject('SESSION END')
 			resolve(bot)
 		})
 		bot.on('error', (err) => reject(err))
@@ -63,4 +70,7 @@ export function uuidv4() {
 		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
 		return v.toString(16);
 	});
+}
+export function censor(s :string) {
+	return s.replace(/^.{0,6}/mi,'******')
 }

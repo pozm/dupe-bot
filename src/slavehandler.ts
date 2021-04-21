@@ -6,6 +6,7 @@ import {Getbal, startDuping, stopDuping} from "./minecraft";
 
 let Bot : Bot;
 
+const old = console.log
 
 function newBot() {
 	Bot.on('respawn',()=>{
@@ -25,8 +26,22 @@ function newBot() {
 		console.log('I have died, stopping duping to prevent further damage.')
 		stopDuping(Bot)
 	})
+	Bot.on('spawnReset',()=>{
+		console.log('ses end')
+	})
+	setInterval(()=>{
+		// old(Bot)
+		// if (!) {
+		// 	console.log('HB failed.')
+		// }
+	},1e3)
+
+
 	stopDuping(Bot);
-	startDuping(Bot);
+	setTimeout(()=>{
+		startDuping(Bot);
+
+	},5e3)
 }
 
 if (isWorker) {
@@ -63,6 +78,7 @@ if (isWorker) {
 						Bot.quit();
 					}
 					login(content.d.u, content.d.p).then(bot =>{
+
 						Bot = bot;
 						process?.send?.({
 							m:'login',
@@ -70,7 +86,6 @@ if (isWorker) {
 							d: bot.player
 
 						})
-
 						// helper
 
 						newBot()
