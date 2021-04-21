@@ -10,9 +10,8 @@ const old = console.log
 
 function newBot() {
 	Bot.on('game',()=>{
-		process?.send?.({
-			m:'11',
-			d: Bot.player
+		Bot.once('respawn',()=>{
+			Bot.chat('/join slupe')
 		})
 	})
 	Bot.on('kicked',()=>{
