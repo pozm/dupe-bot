@@ -9,10 +9,10 @@ export function mcUser( req:Request,res:Response,next:NextFunction ) {
 	switch (n) {
 		case 'all' : {
 			Botter = []
-			for (let worker of bm.workers) {
+			res.locals.wa = bm.workers
+			for (let worker of res.locals.wa) {
 				Botter.push( bm.PlayerFromUUID (bm.uuidFromW(worker.id)))
 			}
-			res.locals.wa =bm.workers
 		} break;
 		default : {
 

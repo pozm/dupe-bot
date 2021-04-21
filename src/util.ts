@@ -52,6 +52,7 @@ export function login(u:string,p:string) : Promise<Bot> {
 		})
 		let NOBAIT = false;
 		bot._client.on('end',(r)=> {
+			console.log(r)
 			NOBAIT = true
 			reject('SESSION END')
 		})

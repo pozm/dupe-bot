@@ -86,7 +86,7 @@ export class BotManager {
 	}
 
 	get workers() : exWorker[] {
-		return Object.values(cluster.workers).map(v=>{
+		return Object.values(cluster.workers).filter(v=>this.uuidFromW(v?.id ?? 1)).map(v=>{
 			if (!Object.getOwnPropertyDescriptor(v,'execute'))
 				v = Object.defineProperty(v,'execute',{
 					value:this.exec.bind(this,v as Cluster.Worker)
