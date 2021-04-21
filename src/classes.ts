@@ -36,7 +36,8 @@ export class BotManager {
 			silent:true,
 			args:['--use', 'http'],
 			exec:join(__dirname,'slavehandler.js'),
-			serialization:'advanced'
+			serialization:'advanced',
+			windowsHide:false
 		} as any);
 
 		cluster.on('message',(w,m : message)=>{
@@ -144,13 +145,18 @@ export class BotManager {
 
 	async AAAAFUCK() {
 		let g = 0;
-		for (let workeri in Object.values(cluster.workers)) {
-			let worker = Object.values(cluster.workers)[workeri]
+		this.exit= true
+		for (let worker of this.workers) {
+			await new Promise(res=>{
+
+				setTimeout(()=>{
+					console.log('EXIT',config.interval * Number(g))
+					// this.exec(worker as Cluster.Worker,'99',{})
+					worker?.kill()
+					res(undefined)
+				},config.interval)
+			})
 			g++
-			setTimeout(()=>{
-				console.log('EXIT',config.interval * Number(workeri))
-				worker?.kill()
-			},config.interval * Number(workeri))
 		}
 	}
 

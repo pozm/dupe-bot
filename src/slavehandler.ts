@@ -164,11 +164,17 @@ if (isWorker) {
 			console.error(e)
 		}
 	})
-	process.on('unhandledRejection',da=>{
-
+	process.on('unhandledRejection',(r,prom)=>{
+		console.error(r)
 	})
-	process.on('uncaughtException',da=>{
-
+	process.on('uncaughtException',(err)=>{
+		console.error(err)
+		process.exit()
 	})
+
+	process.on('SIGINT', () => {
+
+	}); // should only exit when told to
+
 
 }
