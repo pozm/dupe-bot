@@ -152,6 +152,15 @@ if (isWorker) {
 						d:{}
 					})
 				} break;
+				case '173' :{
+					let pos = Bot.quickBarSlot + Bot.inventory.inventoryStart
+					await Bot.tossStack(Bot.inventory.itemsRange(pos,pos)[0])
+					process?.send?.({
+						m:content.m,
+						u:content.u,
+						d:{}
+					})
+				} break;
 				case '51' :{
 					let b = (await Getbal(Bot))
 					let mon = parseInt(b.replace(/\D+/gmi,''))
