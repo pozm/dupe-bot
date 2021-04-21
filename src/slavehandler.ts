@@ -21,6 +21,9 @@ function newBot() {
 			d:{}
 		})
 	})
+	Bot.on('entityHurt',()=>{
+		Bot.chat('/sell inventory')
+	})
 	Bot.on('death',()=>{
 		console.log('I have died, stopping duping to prevent further damage.')
 		stopDuping(Bot)
