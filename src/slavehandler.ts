@@ -9,7 +9,7 @@ let Bot : Bot;
 const old = console.log
 
 function newBot() {
-	Bot.on('respawn',()=>{
+	Bot.on('game',()=>{
 		process?.send?.({
 			m:'11',
 			d: Bot.player
@@ -29,6 +29,7 @@ function newBot() {
 	// Bot.on('spawnReset',()=>{
 	// 	console.log('ses end')
 	// })
+
 	setInterval(()=>{
 		// old(Bot)
 		// if (!) {
