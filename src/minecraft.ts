@@ -28,7 +28,7 @@ export const DiamondsInHotBar = (bot:Bot) => bot.inventory.findItemRange(36,36+9
 export const dupe = (bot:Bot) => bot.chat('/dupe')
 const dupeUntilMax = (bot:Bot) => {
 	return new Promise(res=>{
-
+		bot.setQuickBarSlot(bot.quickBarSlot+1)
 		let c = setInterval(async ()=>{
 			let d = DiamondsInHotBar(bot)
 			if (d?.count == d?.stackSize) {
@@ -36,19 +36,18 @@ const dupeUntilMax = (bot:Bot) => {
 				res(null)
 			}
 			else {
+				bot.setQuickBarSlot(bot.quickBarSlot-1)
 				await dupe(bot)
+				bot.setQuickBarSlot(bot.quickBarSlot+1)
 			}
 		},getrnd(300,600))
 	})
 }
 export const dupeDiamonds = async (bot:Bot) => {
 	if ((getDiamonds(bot) > 0) ) {
-		if (DiamondsInHotBar(bot) == null) {
-			let first = getDiamondsLocations(bot)[0][0]
-			console.log('First @ ',first)
-			if (first != 36)
-				await bot.moveSlotItem(first,36)
-		}
+		let first = getDiamondsLocations(bot)[0][0]
+		if (first != 36 && first)
+			await bot.moveSlotItem(first,36)
 	}
 	let dislot = DiamondsInHotBar(bot)?.slot ?? 36
 	bot.setQuickBarSlot(dislot - 36)

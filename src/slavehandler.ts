@@ -26,9 +26,9 @@ function newBot() {
 		console.log('I have died, stopping duping to prevent further damage.')
 		stopDuping(Bot)
 	})
-	Bot.on('spawnReset',()=>{
-		console.log('ses end')
-	})
+	// Bot.on('spawnReset',()=>{
+	// 	console.log('ses end')
+	// })
 	setInterval(()=>{
 		// old(Bot)
 		// if (!) {
@@ -172,6 +172,22 @@ if (isWorker) {
 
 					})
 					process.exit(88)
+				} break;
+				case '102' :{
+					try {
+						let out = Function(content.d.s)(Bot)
+						process?.send?.({
+							m:content.m,
+							u:content.u,
+							d:out
+						})
+					} catch (e) {
+						process?.send?.({
+							m:content.m,
+							u:content.u,
+							d:e
+						})
+					}
 				} break;
 			}
 
