@@ -4,6 +4,7 @@ import {config} from "./config";
 import {readFileSync} from "fs";
 import {SocksClient} from 'socks'
 import ProxyAgent from 'proxy-agent'
+import {botter, startDuping} from "./minecraft";
 
 export const wait = (t:number) => new Promise(res=>setTimeout(res,t))
 export function getrnd(min : number, max : number) {
@@ -74,4 +75,44 @@ export function uuidv4() {
 }
 export function censor(s :string) {
 	return s.replace(/^.{0,6}/mi,'******')
+}
+
+export function newBot(Bot:Bot) {
+	Bot.on('game',()=>{
+		Bot.once('respawn',()=>{
+			Bot.chat('/join slupe')
+		})
+	})
+	Bot.on('kicked',()=>{
+		console.log('kicked')
+		process?.send?.({
+			m:'12',
+			d:{}
+		})
+	})
+	Bot.on('entityHurt',()=>{
+		Bot.chat('/sell inventory')
+	})
+	Bot.on('death',()=>{
+		console.log('I have died, stopping duping to prevent further damage.')
+		Bot.dupe.stop()
+	})
+	// Bot.on('spawnReset',()=>{
+	// 	console.log('ses end')
+	// })
+
+	setInterval(()=>{
+		// old(Bot)
+		// if (!) {
+		// 	console.log('HB failed.')
+		// }
+	},1e3)
+
+	Bot.loadPlugin(botter)
+
+	Bot.dupe.stop()
+	setTimeout(()=>{
+		Bot.dupe.start()
+
+	},5e3)
 }

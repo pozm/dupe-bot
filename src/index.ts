@@ -3,12 +3,11 @@ import {app} from "./express";
 import {config} from "./config";
 import {Bot, createBot} from "mineflayer";
 import {readFileSync} from "fs";
-import {BotManager} from "./classes";
 import {inspect} from "util";
+import {botManager} from "./classes";
 
-const bm = new BotManager()
-let addacc = bm.add.bind(bm)
-
+let bm = new botManager()
+const addacc = bm.add.bind(bm)
 
 async function main () {
 	// convert accounts.txt => array
@@ -20,7 +19,7 @@ async function main () {
 	const bots = (await Promise.allSettled(botProms)).map(({ value, reason } : {value:any,reason:any} | any) => value || reason).filter(value => !(value instanceof Error) && value !== undefined)
 	console.log(`Bots (${bots.length} / ${accounts.length}) successfully logged in.`)
 
-	console.log(inspect(bm.uuidToWorker))
+	console.log(inspect(bm))
 
 
 }
@@ -34,8 +33,8 @@ app.listen(4231,'0.0.0.0',()=>{
 process.stdin.resume();//so the program will not close instantly
 
 async function exitHandler() {
-	await bm.AAAAFUCK()
-	process.exit()
+
+	await bm.exit()
 }
 
 //do something when app is closing
