@@ -1,76 +1,50 @@
 import express from "express";
-import {startDuping, stopDuping} from "../minecraft";
 import {bm} from "../index";
-import {mcTarget, mcUser} from "../middleware";
-import {exWorker} from "../classes";
+import {mcHandle} from "../middleware";
 let router = express.Router()
 
 router.get('/test',(req,res)=>{
 	res.send('OK')
 })
-
-router.get('/money',async (req,res)=>{
-	let bot = bm.user[req.header('user') ?? '']
-	let [m] = await bot.execute<string>('75',{})
-	res.send(m)
-})
+//
+router.get('/money',mcHandle(async ({user}, req, res,r)=>{
+	await user.getBal().then(mon=>{
+		r({data:mon})
+	},res=>r({err:8,msg:res}))
+}))
 router.get('/players',async (req,res)=>{
-	res.send(await bm.players)
+	res.send(bm.players)
 })
-router.post('/tp',mcTarget,mcUser,async (req,res)=>{
-	let worker = res.locals.worker as exWorker
-	if ('wa' in res.locals) {
-		for (let w of res.locals.wa) {
-			await w.execute('45',{t:res.locals.target.username})
-		}
-	} else
-		await worker.execute('45',{t:res.locals.target.username})
-	return res.send(true)
-})
-
-router.post('/deposit',mcUser,async (req,res)=>{
-	let worker = res.locals.worker as exWorker
-	if ('wa' in res.locals) {
-		for (let w of res.locals.wa) {
-			await w.execute('51',{})
-		}
-	} else
-		await worker.execute('51',{})
-	return res.send(true)
-})
-
-router.post('/chat',mcUser,async (req,res)=>{
-	let worker = res.locals.worker as exWorker
+router.post('/tp',mcHandle(async ({user,target}, req, res,r)=>{
+	user.chat(`/tpa ${target?.username}`)
+},{target:2}))
+//
+router.post('/deposit',mcHandle(async ({user,target}, req, res,r)=>{
+	let money = await user.getBal().catch(res=>r({err:8,msg:res})) as string
+	if (!money)
+		r({err:8,msg:'Unable to get'})
+	let mon = parseInt(money.replace(/\D+/gmi,''))
+	if (target) {
+		user.chat(`/pay ${target.username} ${mon}`)
+	} else {
+		user.chat(`/f money d ${mon}`)
+	}
+	r({data:mon})
+},{target:1}))
+router.post('/chat',mcHandle(async ({user}, req, res,r)=>{
 	let {msg} = req.body
 	if (!msg)
 		return res.status(400).json({err:3,msg:'invalid body'})
-	if ('wa' in res.locals) {
-		for (let w of res.locals.wa) {
-			await w.execute('172',{m:msg})
-		}
-	} else
-		await worker.execute('172',{m:msg})
-	return res.send(true)
+	user.chat(`/${msg}`)
+}))
+router.post('/start',mcHandle(async ({user}, req, res,r)=>{
+	r({data:user.dupe.start()})
+}))
+router.post('/stop',mcHandle(async ({user}, req, res,r)=>{
+	r({data:user.dupe.stop()})
+}))
+router.post('/kill',(req,res)=>{
+	res.send('OK')
+	bm.exit()
 })
-
-router.post('/kill',async (req,res)=>{
-	await bm.AAAAFUCK()
-	process.exit()
-	return res.send(true)
-})
-
-router.post('/start',async (req,res)=>{
-	let bot = bm.user[req.header('user') ?? '']
-	// console.log(bot)
-	let out = await bot.execute('76',{})
-	// let [suc] = bot.execute('76',{})
-	console.log(!out)
-	res.send(!!out)
-})
-router.post('/stop',async (req,res)=>{
-	let bot = bm.user[req.header('user') ?? '']
-	let [suc] = await bot.execute('77',{})
-	res.send(!!suc)
-})
-
 export default router

@@ -24,8 +24,8 @@ export const sellButOne = (bot:Bot) => {
 	bot.chat('/sell diamond_block -1')
 }
 
-export const DiamondsInHotBar = (bot:Bot) => bot.inventory.findItemRange(36,36+9,item.diamondB,null,true,null)
-export const dupe = (bot:Bot) => bot.chat('/dupe')
+const DiamondsInHotBar = (bot:Bot) => bot.inventory.findItemRange(36,36+9,item.diamondB,null,true,null)
+const dupe = (bot:Bot) => bot.chat('/dupe')
 const dupeUntilMax = (bot:Bot) => {
 	return new Promise(res=>{
 		bot.setQuickBarSlot(bot.quickBarSlot+1)
@@ -86,14 +86,49 @@ export function Getbal(bot:Bot) : Promise<string> {
 		}
 		bot.on('message',handlerli)
 		bot.chat('/bal')
+
 	})
 }
 
-export function stopDuping(bot:Bot) {
+
+function inject(bot:Bot) {
+	bot.getChat = (msg:string) : Promise<ChatMessage> => {
+		return new Promise((resolve, reject) => {
+			let h = (ms2:ChatMessage)=>{
+				resolve(ms2)
+				bot.removeListener('message',h)
+			}
+			bot.once('message',h).chat('/'+msg)
+			setTimeout(()=>reject('timeout'),4e3)
+		})
+	}
+	bot.getBal = () => {
+		return new Promise((res,rej)=>{
+
+			bot.getChat('bal').then(msg=>{
+				let money = msg?.extra?.[1]?.text?.slice?.(1)
+				if (!money?.match(/^\D[\d,.]*$/gmi))
+					return rej('Unable to get');
+				res(money)
+			},rea=>rej('Unable to get'))
+		})
+	}
+	bot.dupe = {
+		start:startDuping.bind(undefined,bot),
+		stop:stopDuping.bind(undefined,bot)
+	}
+}
+
+
+
+function stopDuping(bot:Bot) {
 	if (!bot)
 		return false;
 	if (!inta[bot.player.uuid])
 		return false;
 	inta[bot.player.uuid] = false
 	return true
+}
+export {
+	inject as botter
 }
