@@ -44,35 +44,43 @@ const dupeUntilMax = (bot:Bot) => {
 	})
 }
 export const dupeDiamonds = async (bot:Bot) => {
-	if ((getDiamonds(bot) > 0) ) {
-		let first = getDiamondsLocations(bot)[0][0]
-		if (first != 36 && first)
-			await bot.moveSlotItem(first,36)
+	try {
+
+		if ((getDiamonds(bot) > 0) ) {
+			let first = getDiamondsLocations(bot)[0][0]
+			if (first != 36 && first)
+				await bot.moveSlotItem(first,36)
+		}
+		let dislot = DiamondsInHotBar(bot)?.slot ?? 36
+		bot.setQuickBarSlot(dislot - 36)
+		await dupeUntilMax(bot)
+	} catch (e) {
+		console.log(e)
 	}
-	let dislot = DiamondsInHotBar(bot)?.slot ?? 36
-	bot.setQuickBarSlot(dislot - 36)
-	await dupeUntilMax(bot)
 }
 
 let inta : {[x:string]:boolean} = {}
 export function startDuping(bot:Bot) {
-	if (!bot)
-		return false;
-	if (inta[bot.player.uuid])
-		return false;
-	inta[bot.player.uuid] = true;
-	new Promise(async res=>{
+	try {
 
-		while (inta) {
-			if (getDiamonds(bot) > 2 )
+		if (!bot)
+			return false;
+		if (inta[bot.player.uuid])
+			return false;
+		inta[bot.player.uuid] = true;
+		new Promise(async res=>{
+
+			while (inta) {
+				if (getDiamonds(bot) > 2 )
+					sellButOne(bot)
+				await dupeDiamonds(bot)
 				sellButOne(bot)
-			await dupeDiamonds(bot)
-			sellButOne(bot)
-			await wait(getrnd(3e3,7e3))
-		}
-		res(null)
-	})
-	return true
+				await wait(getrnd(3e3,7e3))
+			}
+			res(null)
+		})
+		return true
+	} catch (e) {return false}
 }
 export function Getbal(bot:Bot) : Promise<string> {
 	return new Promise(res=>{
@@ -113,6 +121,7 @@ function inject(bot:Bot) {
 			},rea=>rej('Unable to get'))
 		})
 	}
+
 	bot.dupe = {
 		start:startDuping.bind(undefined,bot),
 		stop:stopDuping.bind(undefined,bot)
@@ -122,12 +131,15 @@ function inject(bot:Bot) {
 
 
 function stopDuping(bot:Bot) {
-	if (!bot)
-		return false;
-	if (!inta[bot.player.uuid])
-		return false;
-	inta[bot.player.uuid] = false
-	return true
+	try {
+		if (!bot)
+			return false;
+		if (!inta[bot.player.uuid])
+			return false;
+		inta[bot.player.uuid] = false
+		return true
+	} catch (e) {return false}
+
 }
 export {
 	inject as botter

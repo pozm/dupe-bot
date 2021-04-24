@@ -4,8 +4,10 @@ import {login, newBot} from "./util";
 
 export class botManager {
 	private bots : Set<Bot>
+	private cred : Map<string,string[]>
 	constructor() {
 		this.bots = new Set<Bot>()
+		this.cred = new Map()
 	}
 
 	protected getByName(n:string) : Bot | undefined {
@@ -47,14 +49,17 @@ export class botManager {
 	}
 
 	remove(bot:Bot) {
+		let cred = this.cred.get(bot.player.uuid)
 		bot.quit()
 		this.bots.delete(bot)
+		return cred
 	}
 	add([u,p]:string[],inx:number=0) : Promise<Bot> {
 		return new Promise((res,rej)=>{
 			setTimeout(()=>{
 				login( u,p).then(botter=>{
 					this.bots.add(botter)
+					this.cred.set(botter?.player?.uuid,[u,p])
 					newBot(botter)
 					res(botter)
 				},rej)

@@ -23,7 +23,7 @@ router.post('/deposit',mcHandle(async ({user,target}, req, res,r)=>{
 	let money = await user.getBal().catch(res=>r({err:8,msg:res})) as string
 	if (!money)
 		r({err:8,msg:'Unable to get'})
-	let mon = parseInt(money.replace(/\D+/gmi,''))
+	let mon = parseInt(money?.replace?.(/\D+/gmi,''))
 	if (target) {
 		user.chat(`/pay ${target.username} ${mon}`)
 	} else {

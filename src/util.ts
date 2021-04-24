@@ -5,6 +5,7 @@ import {readFileSync} from "fs";
 import {SocksClient} from 'socks'
 import ProxyAgent from 'proxy-agent'
 import {botter, startDuping} from "./minecraft";
+import {bm} from "./index";
 
 export const wait = (t:number) => new Promise(res=>setTimeout(res,t))
 export function getrnd(min : number, max : number) {
@@ -85,10 +86,8 @@ export function newBot(Bot:Bot) {
 	})
 	Bot.on('kicked',()=>{
 		console.log('kicked')
-		process?.send?.({
-			m:'12',
-			d:{}
-		})
+		let cred = bm.remove(Bot)
+		bm.add(cred as string[])
 	})
 	Bot.on('entityHurt',()=>{
 		Bot.chat('/sell inventory')
