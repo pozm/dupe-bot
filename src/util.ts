@@ -111,7 +111,7 @@ export function newBot(Bot:Bot) {
 
 	Bot.dupe.stop()
 	setTimeout(()=>{
-		Bot.dupe.start()
+		// Bot.dupe.start()
 
 	},5e3)
 }

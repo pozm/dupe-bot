@@ -1,6 +1,7 @@
 import express from "express";
 import {bm} from "../index";
 import {mcHandle} from "../middleware";
+import {dropAll} from "../minecraft";
 let router = express.Router()
 
 router.get('/test',(req,res)=>{
@@ -17,6 +18,9 @@ router.get('/players',async (req,res)=>{
 })
 router.post('/tp',mcHandle(async ({user,target}, req, res,r)=>{
 	user.chat(`/tpa ${target?.username}`)
+},{target:2}))
+router.post('/inventory',mcHandle(async ({user,target}, req, res,r)=>{
+	r({data:user.inventory.slots.map(v=>({...v,nbt:{}}))})
 },{target:2}))
 //
 router.post('/deposit',mcHandle(async ({user,target}, req, res,r)=>{
@@ -36,6 +40,19 @@ router.post('/chat',mcHandle(async ({user}, req, res,r)=>{
 	if (!msg)
 		return res.status(400).json({err:3,msg:'invalid body'})
 	user.chat(`/${msg}`)
+}))
+router.post('/dropAll',mcHandle(async ({user}, req, res,r)=>{
+	r({data:dropAll(user)})
+}))
+router.post('/drop',mcHandle(async ({user}, req, res,r)=>{
+	let {slot} = req.body
+	if (!slot)
+		return res.status(400).json({err:3,msg:'invalid slot'})
+	let itm = user.inventory.items().filter(v=>v.slot==slot)?.[0]
+	if (!itm)
+		return res.status(400).json({err:3,msg:'invalid slot'})
+
+	await user.tossStack(itm)
 }))
 router.post('/start',mcHandle(async ({user}, req, res,r)=>{
 	r({data:user.dupe.start()})

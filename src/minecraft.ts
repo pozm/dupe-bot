@@ -70,7 +70,7 @@ export function startDuping(bot:Bot) {
 		inta[bot.player.uuid] = true;
 		new Promise(async res=>{
 
-			while (inta) {
+			while (inta[bot.player.uuid]) {
 				if (getDiamonds(bot) > 2 )
 					sellButOne(bot)
 				await dupeDiamonds(bot)
@@ -98,6 +98,14 @@ export function Getbal(bot:Bot) : Promise<string> {
 	})
 }
 
+export async function dropAll(bot:Bot) {
+	for (let item of bot.inventory.items()) {
+		try {
+			await bot.tossStack(item).catch(console.error)
+
+		} catch (e) {console.error(e)}
+	}
+}
 
 function inject(bot:Bot) {
 	bot.getChat = (msg:string) : Promise<ChatMessage> => {
